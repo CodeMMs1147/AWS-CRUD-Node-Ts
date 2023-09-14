@@ -11,17 +11,23 @@ export class UserUpdaterUseCase {
     this._userGetterById = new UserGetterById(userRepository)
   }
 
-  async run (data: User): Promise<User> {
-    const user = await this._userGetterById.run(data.id)
+  async run (data: User[]): Promise<User[]> {
+    const usersArray: User[] = []
 
-    const dataToUpdate: User = {
-      id: data.id,
-      name: data.name ?? user.name,
-      username: data.username ?? user.username,
-      age: data.age ?? user.age
+    for (const usuario of data) {
+      const user = await this._userGetterById.run(usuario.id)
+
+      const dataToUpdate: User = {
+        id: usuario.id,
+        name: usuario.name ?? user.name,
+        username: usuario.username ?? user.username,
+        age: usuario.age ?? user.age
+      }
+
+      const userUpdated: User = await this._userRepository.update(dataToUpdate)
+      usersArray.push(userUpdated)
     }
 
-    const userUpdated: User = await this._userRepository.update(dataToUpdate)
-    return userUpdated
+    return usersArray
   }
 }

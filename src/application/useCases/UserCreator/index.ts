@@ -13,13 +13,20 @@ export class UserCreatorUserCase {
     this._existUserByUserName = new ExistUserByUserName(userRepository)
   }
 
-  async run (body: User): Promise<User> {
-    const existUser: boolean = await this._existUserByUserName.run(body.username!)
+  async run (body: User[]): Promise<User[]> {
+    const usersArray: User[] = []
 
-    if (existUser) throw new UserAlreadyExistsException()
+    for (const usuario of body) {
+      const existUser: boolean = await this._existUserByUserName.run(usuario.username!)
 
-    const userCreated: User = await this._userRepository.save(body)
+      if (existUser) {
+        throw new UserAlreadyExistsException()
+      }
 
-    return userCreated
+      const userCreated: User = await this._userRepository.save(usuario)
+      usersArray.push(userCreated)
+    }
+
+    return usersArray
   }
 }
