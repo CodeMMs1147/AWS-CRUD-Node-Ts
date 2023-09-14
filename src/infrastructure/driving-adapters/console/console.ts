@@ -1,5 +1,6 @@
-// import { UserGetterUseCase } from "@application/useCases/UserGetter"
 import { UserCreatorUserCase } from '@application/useCases/UserCreator'
+import { UserGetterUseCase } from '@application/useCases/UserGetter'
+import { UserUpdaterUseCase } from '@application/useCases/UserUpdater'
 import { User } from '@domain/entities/User'
 import { InMemoryUserRepository } from '@infrastructure/implementations/InMemory/InMemoryUserRepository'
 
@@ -7,20 +8,29 @@ import { InMemoryUserRepository } from '@infrastructure/implementations/InMemory
 (async () => {
   const unMemoryUserRepo = new InMemoryUserRepository()
 
-  console.log(unMemoryUserRepo.userData)
-
+  // creando usuarios
   const userCreatorCase = new UserCreatorUserCase(unMemoryUserRepo)
-
   const userToCreate: User = {
-    id: '123',
+    id: '1',
     username: 'Codemms',
     name: 'juan',
     age: 25
   }
 
   await userCreatorCase.run(userToCreate)
-  console.log(unMemoryUserRepo.userData)
-  // const userGetterUseCase = new UserGetterUseCase(new InMemoryUserRepository())
-  // const users = await userGetterUseCase.run()
-  // console.log(users)
+
+  // obteniendo usuarios
+  const userGetterUseCase = new UserGetterUseCase(unMemoryUserRepo)
+  const usersReturned = await userGetterUseCase.run()
+  console.log(usersReturned)
+
+  // actualizando usuarios
+  const userUpdaterUseCase = new UserUpdaterUseCase(unMemoryUserRepo)
+  await userUpdaterUseCase.run({
+    id: '1',
+    username: 'Lapuntuj'
+  })
+
+  const usersReturned2 = await userGetterUseCase.run()
+  console.log(usersReturned2)
 })()
